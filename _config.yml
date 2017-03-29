@@ -7,12 +7,12 @@ baseurl: '/jekyll-uno/'
 # disqus_shortname: 'your-disqus-name'
 
 author:
-  name: 'Josh Gerdes'
-  email: josh@joshgerdes.com
-  twitter_username: joshgerdes
-  facebook_username: joshgerdes
-  github_username:  joshgerdes
-  linkedin_username:  joshgerdes
+  name: 'Burak Keten'
+  email: brk_ktn_16@hotmail.com
+  twitter_username: brk_ktn
+  facebook_username: -
+  github_username:  bketen
+  linkedin_username:  -
 
 defaults:
   -
