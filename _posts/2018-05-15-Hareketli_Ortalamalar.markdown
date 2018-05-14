@@ -25,4 +25,4 @@ C dili için örnek:
 
 ADC pinlerinin okunmasında hareketli ortalamalar filtresinin uygulandığı örnek uygulama
 
-[Stm8 Read ADC with moving average filter] (https://github.com/bketen/Stm8l-Moving-Average-ADC)
+([Stm8 Read ADC with moving average filter] (https://github.com/bketen/Stm8l-Moving-Average-ADC))
