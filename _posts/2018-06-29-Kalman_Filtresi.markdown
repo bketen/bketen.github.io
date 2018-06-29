@@ -15,6 +15,7 @@ Tahmin Etme:
 Çıkışın ve Hata Kovaryasyonunun tahmini yapılır.
 
 `x(k) = x(k-1) + u(k)`
+
 `e(k) = e(k-1) + Q`
 
 x(k): çıkış tahmini değeri
@@ -29,7 +30,9 @@ Düzeltme adımında, önceki durumun verilerine göre kalman kazancı hesaplan�
 Kalman kazancına göre, Çıkış ve Hata kovaryasyon değerinde düzeltme yapılır.
 
 `Kk = e(k) / ( e(k) + R )`
+
 `x(k) = x(k) + Kk * ( z(k) - x(k) )`
+
 `e(k) = ( 1 - Kk ) * e(k)`
 
 Kk: Kalman Kazancı
