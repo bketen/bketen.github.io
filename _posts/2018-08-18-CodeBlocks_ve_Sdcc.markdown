@@ -55,10 +55,15 @@ Sol alt kısmında bulunan "Build option" butonuna basarak derleyici ayarlarına
 ![image](/images/posts/codeblocks/code-blocks-8.jpg)
 
 Açılan pencerede "Compiler settings" sekmesinden "Compiler Flags" kısmına geliyoruz ve Stm8 için gerekli bayrakları işaretliyoruz.
+
 	a) ISO C99 with SDCC extension [--std-sdcc99]
+	
 	b) Optimize for code size rather then speed [--opt-code-size]
+	
 	c) STMicroelectronics STM8 [-mstm8]
+	
 	d) Large model programs [--model-large]
+	
 	e) Intel Hex [--out-fmt-ihx]
 
 Bu bayrakları işaretledikten sonra çıkıyoruz.
@@ -77,6 +82,7 @@ Gelen pencerede "Dosya Adı" kısmını "main.c" şeklinde dolduruyouz ve kayded
 ![image](/images/posts/codeblocks/code-blocks-12.jpg)
 
 main.c dosyasını aşağıdaki örneğimizdeki gibi dolduruyoruz.
+
 [Uyguluma örneğimiz](https://github.com/bketen/Stm8-Sdcc-Example){:target="_blank"}
 
 Artık projemizi "Build" ettiğimiz zaman "\bin\Release" klasörü altında .hex dosyamız oluşmuş olacak.
