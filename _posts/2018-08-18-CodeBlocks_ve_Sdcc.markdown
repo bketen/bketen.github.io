@@ -76,7 +76,7 @@ Main dosyası eklemek için en üstte "File" sekmesinden "New" ==> "Empty file" 
 
 Gelen uyarıda evete tıklıyoruz.
 Böylelikle oluşturacağımız dosya, projemize eklenmiş olacak.
-![image](/images/posts/codeblocks/code-blocks-11.jpg)
+![image](/images/posts/codeblocks/code-blocks-11.png)
 
 Gelen pencerede "Dosya Adı" kısmını "main.c" şeklinde dolduruyouz ve kaydediyoruz.
 ![image](/images/posts/codeblocks/code-blocks-12.jpg)
