@@ -17,7 +17,7 @@ Ardından yapılacak işlemin fonksiyon kodu eklenir.
 Devamına veri eklenir.
 En sonuna da hata kontrol değeri eklenir.
 
-Mesajımız ` Adres + Fonksiyon Kodu + Veri + Hata Kontrol Değeri ` şeklinde olur.
+Mesajımız `Adres + Fonksiyon Kodu + Veri + Hata Kontrol Değeri` şeklinde olur.
 
 Freemodbus kütüphanesinin Stm8 için port edilmesi:
 
@@ -32,7 +32,7 @@ Artık kütüphaneyi eklediğimize göre gerekli ayarlamaları yapmaya geçebili
 
 İlk olarak `port.h` dosyası içerisinde;
 
-1) En başta ` #include "stm8l15x.h" ` ekliyoruz. Böylece kütühane içerisinde stm8 tanımlamalarına erişim sağlıyoruz.
+1) En başta `#include "stm8l15x.h"` ekliyoruz. Böylece kütühane içerisinde stm8 tanımlamalarına erişim sağlıyoruz.
 	
 2) Kesmeleri aktif etmek için `ENTER_CRITICAL_SECTION()` fonksiyonunu tanımlıyoruz.
 Bunun için fonksiyon oluşturabiliriz veya Makro tanımlayabiliriz.
@@ -48,7 +48,8 @@ Biz örneğimizde makro tanımlayacağız.
 
 1) Rx ve Tx Kesmelerini etkinleştirmek ve devredışı bırakmak için gerekli kodlarla `vMBPortSerialEnable( BOOL xRxEnable, BOOL xTxEnable )` fonksiyonunu tamamlıyoruz.
 	
-'void vMBPortSerialEnable( BOOL xRxEnable, BOOL xTxEnable )
+```c
+void vMBPortSerialEnable( BOOL xRxEnable, BOOL xTxEnable )
 {
 /* If xRXEnable enable serial receive interrupts. If xTxENable enable
 * transmitter empty interrupts.
@@ -70,11 +71,13 @@ else
 {
 	USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
 }
-}'
+}
+```
 	
 2) Seri portu açmak için `xMBPortSerialInit( UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits, eMBParity eParity )` fonksiyonunu tamamlıyoruz.
-	
-'BOOL xMBPortSerialInit( UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits, eMBParity eParity )
+
+```c	
+BOOL xMBPortSerialInit( UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits, eMBParity eParity )
 {
 	USART_Parity_TypeDef parity = USART_Parity_No;
 	USART_WordLength_TypeDef wordLength = USART_WordLength_8b; 
@@ -103,40 +106,50 @@ GPIO_ExternalPullUpConfig(GPIOC, GPIO_Pin_2, ENABLE);
 USART_Init(USART1, ulBaudRate, wordLength, USART_StopBits_1, parity, USART_Mode_Rx | USART_Mode_Tx);
   
 return TRUE;
-}'
+}
+```
 	
 3) Tx kesmesi içerisinden `pxMBFrameCBTransmitterEmpty()` fonksiyonunu, Rx kesmesi içerisinden `pxMBFrameCBByteReceived()` fonksiyonunu çağırıyoruz.
 	
-'INTERRUPT_HANDLER(USART1_TX_TIM5_UPD_OVF_TRG_BRK_IRQHandler,27)
+```c
+INTERRUPT_HANDLER(USART1_TX_TIM5_UPD_OVF_TRG_BRK_IRQHandler,27)
 {
 	pxMBFrameCBTransmitterEmpty();
-}'
-	
-'INTERRUPT_HANDLER(USART1_RX_TIM5_CC_IRQHandler,28)
+}
+```
+
+```c
+INTERRUPT_HANDLER(USART1_RX_TIM5_CC_IRQHandler,28)
 {  
 	USART_ClearITPendingBit(USART1, USART_IT_RXNE);
 	pxMBFrameCBByteReceived();
-}'
+}
+```
 	
 4)Veri alımı için `BOOL xMBPortSerialGetByte(CHAR* pucByte)` fonksiyonunu, Veri gönderimi için `BOOL xMBPortSerialPutByte(CHAR ucByte)` fonksiyonunu tamamlıyoruz.
 	
-'BOOL xMBPortSerialGetByte( CHAR * pucByte )
+```c
+BOOL xMBPortSerialGetByte( CHAR * pucByte )
 {
 	*pucByte = USART_ReceiveData8(USART1);
 	return TRUE;
-}'
-	
-'BOOL xMBPortSerialPutByte( CHAR ucByte )
+}
+```
+
+```c
+BOOL xMBPortSerialPutByte( CHAR ucByte )
 {
 	USART_SendData8(USART1, ucByte);
 	return TRUE;
-}'
+}
+```
 	
 Paket başlangıcı olduğunu belirten 3.5 karakterlik süre ile paketin bozulduğu anlaşılan 1,5 karakterlik süreyi anlamak için Zamanlayıcı kullanılır. Bunun için `porttimer.c` dosyası içerisinde;
 
 1) Zamanlayıcıyı ayarlamak için `BOOL xMBPortTimersInit( USHORT usTim1Timerout50us )` fonksiyonu tamamlanır.
 	
-'BOOL xMBPortTimersInit( USHORT usTim1Timerout50us )
+```c
+BOOL xMBPortTimersInit( USHORT usTim1Timerout50us )
 {
 	/* Enable TIM1 CLK */
 	CLK_PeripheralClockConfig(CLK_Peripheral_TIM1, ENABLE);
@@ -149,28 +162,35 @@ Paket başlangıcı olduğunu belirten 3.5 karakterlik süre ile paketin bozuldu
 	TIM1_ITConfig(TIM1_IT_Update, ENABLE);
  
 	return TRUE;
-}'
+}
+```
 	
 2) Zamanlayıcıyı etkinleştirmek `void vMBPortTimersEnable()` fonksiyonu, devredışı bırakmak için `void vMBPortTimersDisable()` fonksiyonu tamamlanır.
 	
-'void vMBPortTimersEnable()
+```c
+void vMBPortTimersEnable()
 {
 	TIM1_SetCounter(0);
 	TIM1_Cmd(ENABLE);
-}'
+}
+```
 
-'void vMBPortTimersDisable()
+```c
+void vMBPortTimersDisable()
 {
 	TIM1_Cmd(DISABLE);
-}'
+}
+```
 	
 3) Zamanlayıcı kesmesi içerisinde `pxMBPortCBTimerExpired()` fonksiyonu çağırılarak taşma durumları kontrol edilir.
 	
-'INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_COM_IRQHandler,23)
+```c
+INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_COM_IRQHandler,23)
 { 
 	TIM1_ClearITPendingBit(TIM1_IT_Update);
 	( void )pxMBPortCBTimerExpired();
-}'
+}
+```
 
 Kit üzerinde yapmamız gereken ayarlar tamamlandı.
 Bilgisayarı master olarak kullanmak için [ModbusPoll](https://www.modbustools.com/modbus_poll.html){:target="_blank"} programını kullanacağız.
