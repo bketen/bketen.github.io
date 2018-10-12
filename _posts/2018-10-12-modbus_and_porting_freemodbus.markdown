@@ -5,7 +5,7 @@ categories: [c]
 tags: [c]
 ---
 
-![image](/images/posts/modbus/modbus.png)
+![image](/images/posts/modbus/Modbus.png)
 
 Modbus, Modicon firmasının geliştirdiği haberleşme protokolüdür.
 Seri port (Modbus RTU, Modbus ASCII) veya ethernet (Modbus TCP) üzerinden kullanılabilir.
