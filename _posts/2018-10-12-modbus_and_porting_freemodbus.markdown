@@ -5,6 +5,8 @@ categories: [c]
 tags: [c]
 ---
 
+![image](/images/posts/modbus/modbus.png)
+
 Modbus, Modicon firmasının geliştirdiği haberleşme protokolüdür.
 Seri port (Modbus RTU, Modbus ASCII) veya ethernet (Modbus TCP) üzerinden kullanılabilir.
 Açık protokol olduğu için çok fazla kullanıcısı bulunmaktadır.
@@ -26,23 +28,27 @@ Freemodbus kütüphanesinin Stm8 için port edilmesi:
 İlk olarak [freemodbus](https://sourceforge.net/projects/freemodbus.berlios/){:target="_blank"} kütüphanesini projemize ekliyoruz ve dizine kaydediyoruz.
 ![image](/images/posts/modbus/modbus-1.jpg)
 
-Daha sonra main.c dosyasının en başına ' #include "mb.h" ' ekleyerek kütüphaneyi projemize dahil ediyoruz.
+Daha sonra main.c dosyasının en başına '#include "mb.h"' ekleyerek kütüphaneyi projemize dahil ediyoruz.
 
 Artık kütüphaneyi eklediğimize göre gerekli ayarlamaları yapmaya geçebiliriz.
 
 İlk olarak `port.h` dosyası içerisinde;
 
-1) En başta `#include "stm8l15x.h"` ekliyoruz. Böylece kütühane içerisinde stm8 tanımlamalarına erişim sağlıyoruz.
+1) En başa `#include "stm8l15x.h"` ekliyoruz. Böylece kütühane içerisinde stm8 tanımlamalarına erişim sağlıyoruz.
 	
-2) Kesmeleri aktif etmek için `ENTER_CRITICAL_SECTION()` fonksiyonunu tanımlıyoruz.
+2) Kesmeleri devre dışı bırakmak için `ENTER_CRITICAL_SECTION()` fonksiyonunu tanımlıyoruz.
 Bunun için fonksiyon oluşturabiliriz veya Makro tanımlayabiliriz.
 Biz örneğimizde makro tanımlayacağız.
 
-' #define ENTER_CRITICAL_SECTION()        ( disableInterrupts() ) '
+```c
+#define ENTER_CRITICAL_SECTION()        ( disableInterrupts() )
+```
 	
-3)Kesmeleri devre dışı bırakmak için de aynı yukarıdaki gibi makro tanımlıyoruz.
+3)Kesmeleri etkinleştirmek için de aynı yukarıdaki gibi makro tanımlıyoruz.
 
-' #define EXIT_CRITICAL_SECTION()         ( enableInterrupts() ) '
+```c
+#define EXIT_CRITICAL_SECTION()         ( enableInterrupts() )
+```
 
 İkinci olarak `portserial.c` dosyası içerisinde;
 
@@ -146,7 +152,7 @@ BOOL xMBPortSerialPutByte( CHAR ucByte )
 	
 Paket başlangıcı olduğunu belirten 3.5 karakterlik süre ile paketin bozulduğu anlaşılan 1,5 karakterlik süreyi anlamak için Zamanlayıcı kullanılır. Bunun için `porttimer.c` dosyası içerisinde;
 
-1) Zamanlayıcıyı ayarlamak için `BOOL xMBPortTimersInit( USHORT usTim1Timerout50us )` fonksiyonu tamamlanır.
+1) Zamanlayıcının ayarlarını yapmak için `BOOL xMBPortTimersInit( USHORT usTim1Timerout50us )` fonksiyonu tamamlanır.
 	
 ```c
 BOOL xMBPortTimersInit( USHORT usTim1Timerout50us )
@@ -165,7 +171,7 @@ BOOL xMBPortTimersInit( USHORT usTim1Timerout50us )
 }
 ```
 	
-2) Zamanlayıcıyı etkinleştirmek `void vMBPortTimersEnable()` fonksiyonu, devredışı bırakmak için `void vMBPortTimersDisable()` fonksiyonu tamamlanır.
+2) Zamanlayıcıyı etkinleştirmek için `void vMBPortTimersEnable()` fonksiyonu, devredışı bırakmak için `void vMBPortTimersDisable()` fonksiyonu tamamlanır.
 	
 ```c
 void vMBPortTimersEnable()
@@ -192,7 +198,58 @@ INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_COM_IRQHandler,23)
 }
 ```
 
+Örneğimizde ModbusRTU kullanacağımızı bildirmek için `mbconfig.h` dosyası içerisinden MB_RTU_ENABLED tanımlamasını 1 yapıyoruz.
+ASCII ve RTU için ise 0 yapıyoruz.
+
+```c
+/*! \brief If Modbus ASCII support is enabled. */
+#define MB_ASCII_ENABLED                        (  0 )
+
+/*! \brief If Modbus RTU support is enabled. */
+#define MB_RTU_ENABLED                          (  1 )
+
+/*! \brief If Modbus TCP support is enabled. */
+#define MB_TCP_ENABLED                          (  0 )
+```
+
 Kit üzerinde yapmamız gereken ayarlar tamamlandı.
+Artık main fonksiyonumuz içerisinde `eMBInit( eMBMode eMode, UCHAR ucSlaveAddress, UCHAR ucPort, ULONG ulBaudRate, eMBParity eParity )` fonksiyonu çağırılarak modbus ilklendirilmiş olur.
+Daha sonra `eMBEnable();` fonksiyonu ile modbus etkinleştirilir.
+Artık sonsuz döngü içerisinde `eMBPoll();` fonksiyonu çalıştırılarak slave cihazımız haberleşmeye hazır olur.
+
+```c
+int main(void)
+{
+
+  InitClock();
+  
+  usRegInputBuf[0] = 16;
+  
+  usRegHoldingBuf[0] = 16;
+  
+  uiRegCoilsBuf[0] = 0x01;
+  
+  uiRegDiscreteBuf[0] = 0x06;
+    
+  eMBErrorCode  eStatus;
+  
+  /* Initialize Protocol Stack. */
+  eStatus = eMBInit( MB_RTU, 1, 0, 19200, MB_PAR_NONE );
+
+  /* Enable the Modbus Protocol Stack. */
+  eStatus = eMBEnable();
+  
+  while(1)
+  {
+    (void)eMBPoll();
+
+    /* Here we simply count the number of poll cycles. */
+    
+  }
+  
+}
+```
+
 Bilgisayarı master olarak kullanmak için [ModbusPoll](https://www.modbustools.com/modbus_poll.html){:target="_blank"} programını kullanacağız.
 Programın kullanımı oldukça basit.
 "Setup" sekmesinin altında "Read/Write Definition" kısmına girerek hangi slave olduğunu, hangi fonksiyonu kullanacağımızı, hangi adresten başlayacağımızı seçiyoruz.
