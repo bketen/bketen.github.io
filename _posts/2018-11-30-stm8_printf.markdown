@@ -1,0 +1,8 @@
+---
+title:  "Stm8 ile Printf Kullanımı"
+date:   2018-11-30 17:03:16
+categories: [c]
+tags: [c]
+---
+
+Devamı gelecek.
