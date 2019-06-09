@@ -5,4 +5,30 @@ categories: [c]
 tags: [c]
 ---
 
-Devamı gelecek.
+Bu yazımızda printf fonksiyonunun Stm8 uart arabirimiyle nasıl kullanılacağına bakacağız.
+
+C standart kütüphanesiyle gelen printf fonksiyonu, çıktısını terminale göndermektedir.
+Biz bu çıktıyı terminale göndermek yerine uart arabirimine yönlendireceğiz.
+
+Printf fonksiyonu çıktısını göndermek için putchar fonksiyonunu kullanır.
+Putchar fonksiyonu standart kütüphane içerisinde "weak fonksiyon" olarak tanımlandığı için kendi putchar fonksiyonumuzu tanımlamamıza müsade etmektedir.
+Böylece kendi putchar fonksiyonumuzu tanımlayarak çıktıyı terminale göndermek yerine uarta yönlendireceğiz.
+
+Putchar fonksiyonu sadece bir karakteri terminale yollar.
+Bu yüzden bir karakteri uarta gönderecek kendi putchar fonksiyonumuzu oluşturuyoruz.
+
+'''c
+int putchar (int c)
+{
+	USART1_DR = c;
+	while(!(USART1_SR & 0x80));
+
+	return (c);
+}
+'''
+
+Artık printf fonksiyonu karakterlerini göndermek için bizim putchar fonksiyonumuzu çağıracak ve dolayısıyla çıktısını uarta göndermiş olacak.
+
+Aynı şekilde spi, lcd gibi diğer arabirimlere yönlendirmekte mümkündür.
+
+Iar ve sdcc için örnek uygulamalara [buradan](https://github.com/bketen/stm8_printf){:target="_blank"} ulaşabilirsiniz.
