@@ -17,7 +17,7 @@ Böylece kendi putchar fonksiyonumuzu tanımlayarak çıktıyı terminale gönde
 Putchar fonksiyonu sadece bir karakteri terminale yollar.
 Bu yüzden bir karakteri uarta gönderecek kendi putchar fonksiyonumuzu oluşturuyoruz.
 
-'''c
+```cpp
 int putchar (int c)
 {
 	USART1_DR = c;
@@ -25,7 +25,7 @@ int putchar (int c)
 
 	return (c);
 }
-'''
+```
 
 Artık printf fonksiyonu karakterlerini göndermek için bizim putchar fonksiyonumuzu çağıracak ve dolayısıyla çıktısını uarta göndermiş olacak.
 
